@@ -1,5 +1,7 @@
 package de.illonis.newup.client;
 
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,8 +15,10 @@ import java.util.List;
 public final class NeWUpClient {
 
 	private final List<UpdateListener> listeners;
-	private final String serverUrl;
-	private final String authToken;
+	private final Updater updater;
+	private LocalFiles local;
+	private ServerFiles server;
+	private final Networker networker;
 
 	/**
 	 * Creates a new update-client.
@@ -22,8 +26,8 @@ public final class NeWUpClient {
 	 * @param updateUrl
 	 *            url to server. Must contain path to updater-directory.
 	 */
-	public NeWUpClient(String updateUrl) {
-		this(updateUrl, "");
+	public NeWUpClient(URL updateUrl, Path localPath) {
+		this(updateUrl, localPath, "");
 	}
 
 	/**
@@ -34,10 +38,12 @@ public final class NeWUpClient {
 	 * @param authToken
 	 *            token for authentication.
 	 */
-	public NeWUpClient(String updateUrl, String authToken) {
-		this.serverUrl = updateUrl;
-		this.authToken = authToken;
+	public NeWUpClient(URL updateUrl, Path localPath, String authToken) {
 		listeners = new LinkedList<UpdateListener>();
+		local = new LocalFiles(localPath);
+		server = new ServerFiles(updateUrl, authToken);
+		networker = new Networker(server, local);
+		updater = new Updater(networker);
 	}
 
 	public void addUpdateListener(UpdateListener listener) {
@@ -61,7 +67,23 @@ public final class NeWUpClient {
 	 *            check, false if not.
 	 */
 	public void checkForUpdates(boolean autoStart) {
+		// FIXME: make threaded
+		UpdateResult result = updater.getUpdateInfo();
+		if (result.getNewFilesAmount() > 0) {
+			if (autoStart) {
+				performUpdate();
+			} else {
+				notifyUpdateInfoReceived(result);
+			}
+		} else {
+			notifyUpdateInfoReceived(result);
+		}
+	}
 
+	private void notifyUpdateInfoReceived(UpdateResult result) {
+		for (UpdateListener listener : listeners) {
+			listener.onUpdateInfoReceived(result);
+		}
 	}
 
 	/**
@@ -73,6 +95,18 @@ public final class NeWUpClient {
 	 * may be issued.
 	 */
 	public void performUpdate() {
-
+		// FIXME: make threaded
+		UpdateResult result;
+		try {
+			result = updater.performUpdate();
+		} catch (UpdateException e) {
+			for (UpdateListener listener : listeners) {
+				listener.onUpdateError(e);
+			}
+			return;
+		}
+		for (UpdateListener listener : listeners) {
+			listener.onUpdateCompleted(result);
+		}
 	}
 }

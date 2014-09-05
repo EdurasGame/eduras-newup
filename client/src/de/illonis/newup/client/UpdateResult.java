@@ -4,10 +4,12 @@ public class UpdateResult {
 
 	private final int newFilesAmount;
 	private final long downloadSize;
+	private final int deleteLocalAmount;
 
-	UpdateResult(int newFilesAmount, int downloadSize) {
+	UpdateResult(int newFilesAmount, long downloadSize, int deleteLocalAmount) {
 		this.newFilesAmount = newFilesAmount;
 		this.downloadSize = downloadSize;
+		this.deleteLocalAmount = deleteLocalAmount;
 	}
 
 	/**
@@ -26,6 +28,15 @@ public class UpdateResult {
 	 */
 	public int getNewFilesAmount() {
 		return newFilesAmount;
+	}
+
+	/**
+	 * Returns number of local files that are obsolete.
+	 * 
+	 * @return number of old files.
+	 */
+	public int getDeleteLocalAmount() {
+		return deleteLocalAmount;
 	}
 
 }
