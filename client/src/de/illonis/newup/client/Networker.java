@@ -16,7 +16,7 @@ public class Networker {
 		this.local = local;
 	}
 
-	InputStream readFile(URL url) throws IOException {
+	static InputStream readFile(URL url) throws IOException {
 		return url.openStream();
 	}
 

@@ -1,5 +1,6 @@
 package de.illonis.newup.client;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -14,13 +15,13 @@ public class ServerFiles implements FileData {
 	}
 
 	@Override
-	public List<FileInfo> getFileList() {
-		// TODO implement
-		return null;
+	public List<FileInfo> getFileList() throws IOException {
+		return new HashListFile(Networker.readFile(new URL(serverUrl,
+				HASHLIST_FILENAME))).getFiles();
 	}
 
 	@Override
-	public String getOverallHash() {
+	public String getOverallHash() throws IOException {
 		// TODO implement
 		return null;
 	}

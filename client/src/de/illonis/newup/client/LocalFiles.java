@@ -1,7 +1,9 @@
 package de.illonis.newup.client;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class LocalFiles implements FileData {
@@ -12,24 +14,24 @@ public class LocalFiles implements FileData {
 	}
 
 	@Override
-	public List<FileInfo> getFileList() {
-		// TODO: implement
-		return null;
+	public List<FileInfo> getFileList() throws IOException {
+		return new HashListFile(Files.newInputStream(
+				localPath.resolve(HASHLIST_FILENAME), StandardOpenOption.READ))
+				.getFiles();
 	}
 
 	@Override
-	public String getOverallHash() {
+	public String getOverallHash() throws IOException {
 		// TODO: implement
 		return "";
 	}
 
 	void delete(FileInfo file) throws IOException {
-		// TODO: implement
+		Files.delete(localPath.resolve(file.getFileName()));
 	}
 
 	String computeLocalUrl(FileInfo file) {
-		// TODO: implement
-		return "";
+		return localPath.resolve(file.getFileName()).toString();
 	}
 
 }

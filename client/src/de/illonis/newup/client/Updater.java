@@ -25,7 +25,7 @@ public class Updater {
 		totalSize = 0;
 	}
 
-	UpdateResult getUpdateInfo() {
+	UpdateResult getUpdateInfo() throws IOException {
 		String serverAllHash = server.getOverallHash();
 		String clientAllHash = local.getOverallHash();
 		if (serverAllHash.equals(clientAllHash)) {
@@ -47,7 +47,7 @@ public class Updater {
 				deleteFiles.size());
 	}
 
-	UpdateResult performUpdate() throws UpdateException {
+	UpdateResult performUpdate() throws UpdateException, IOException {
 		if (!checked) {
 			getUpdateInfo();
 		}
