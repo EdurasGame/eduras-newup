@@ -1,0 +1,67 @@
+# Backup Files #
+################
+*~
+*.bak
+*~*
+*.vpp.working
+
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+version
+gitversion
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# User specific stuff #
+######################
+org.eclipse.jdt.core.prefs
+#.classpath
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+thumbs.db
+Thumbs.db
+Thumbs.db/EventingServer
+
+# log files #
+#############
+logfile.txt*
+*.log
+*.lck
+*.log*
+
+# outsourced repos
+EdurasLauncher/
+EduLog/
+EventingServer/
+www/
