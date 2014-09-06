@@ -1,5 +1,7 @@
 package de.illonis.newup.client;
 
+import java.io.IOException;
+
 /**
  * Listens for update results.
  * 
@@ -27,13 +29,22 @@ public interface UpdateListener {
 	void onUpdateInfoReceived(UpdateResult result);
 
 	/**
-	 * Called when an update occured while receiving update or update
+	 * Called when an error occured while receiving update or update
 	 * information.
 	 * 
 	 * @param e
 	 *            the error.
 	 */
 	void onUpdateError(UpdateException e);
+
+	/**
+	 * Called when a network error occurs while downloading files or
+	 * information.
+	 * 
+	 * @param e
+	 *            the error.
+	 */
+	void onNetworkError(IOException e);
 
 	/**
 	 * Updates the overall update progress.
@@ -44,4 +55,9 @@ public interface UpdateListener {
 	 *            describes current action.
 	 */
 	void updateProgress(int progress, String note);
+
+	/**
+	 * Called when update process was cancelled and has stopped.
+	 */
+	void onUpdateCancelled();
 }

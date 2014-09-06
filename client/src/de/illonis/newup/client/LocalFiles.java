@@ -33,5 +33,10 @@ public class LocalFiles implements FileData {
 	String computeLocalUrl(FileInfo file) {
 		return localPath.resolve(file.getFileName()).toString();
 	}
+	
+	boolean verify(FileInfo file) {
+		// TODO: implement
+		return false;		
+	}
 
 }

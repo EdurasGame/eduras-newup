@@ -6,52 +6,93 @@ import java.util.List;
 
 import de.illonis.newup.client.UpdateException.ErrorType;
 
-public class Updater {
+public class Updater extends Thread {
 	private final Networker networker;
 	private LocalFiles local;
 	private ServerFiles server;
-	private boolean checked;
 	private boolean updateRequired;
 	private List<FileInfo> downloadFiles;
 	private List<FileInfo> deleteFiles;
 	private long totalSize;
+	private boolean cancelRequested;
+	private final boolean autoStart;
+	private IOException ioException;
+	private UpdateException updateException;
 
-	Updater(Networker networker) {
+	Updater(Networker networker, boolean autoStart) {
 		this.networker = networker;
+		this.autoStart = autoStart;
 		deleteFiles = new LinkedList<FileInfo>();
 		downloadFiles = new LinkedList<FileInfo>();
 		updateRequired = true;
-		checked = false;
 		totalSize = 0;
+		cancelRequested = false;
 	}
 
-	UpdateResult getUpdateInfo() throws IOException {
-		String serverAllHash = server.getOverallHash();
-		String clientAllHash = local.getOverallHash();
-		if (serverAllHash.equals(clientAllHash)) {
-			return new UpdateResult(0, 0, 0);
+	@Override
+	public void run() {
+		try {
+			getUpdateInfo();
+			if (autoStart && !cancelRequested) {
+				performUpdate();
+			}
+		} catch (IOException e) {
+			ioException = e;
+		} catch (UpdateException e) {
+			updateException = e;
 		}
-		List<FileInfo> localFiles = local.getFileList();
-		List<FileInfo> serverFiles = server.getFileList();
 
-		downloadFiles = computeDownloadFiles(localFiles, serverFiles,
-				deleteFiles);
-		if (downloadFiles.size() > 0 || deleteFiles.size() > 0)
-			updateRequired = true;
-		totalSize = 0;
-		for (FileInfo fileInfo : downloadFiles) {
-			totalSize += fileInfo.getFileSize();
+	}
+
+	boolean isCancelled() {
+		return cancelRequested;
+	}
+
+	UpdateResult getResult() throws IOException, UpdateException {
+		if (ioException != null) {
+			throw ioException;
 		}
-		checked = true;
+		if (updateException != null)
+			throw updateException;
 		return new UpdateResult(downloadFiles.size(), totalSize,
 				deleteFiles.size());
 	}
 
-	UpdateResult performUpdate() throws UpdateException, IOException {
-		if (!checked) {
-			getUpdateInfo();
+	void cancel() {
+		cancelRequested = true;
+	}
+
+	void getUpdateInfo() throws IOException {
+		downloadFiles.clear();
+		totalSize = 0;
+		deleteFiles.clear();
+		if (cancelRequested)
+			return;
+		String serverAllHash = server.getOverallHash();
+		String clientAllHash = local.getOverallHash();
+		if (serverAllHash.equals(clientAllHash)) {
+			updateRequired = false;
+			return;
 		}
-		if (updateRequired) {
+		if (cancelRequested)
+			return;
+		List<FileInfo> localFiles = local.getFileList();
+		List<FileInfo> serverFiles = server.getFileList();
+		if (cancelRequested)
+			return;
+		downloadFiles = computeDownloadFiles(localFiles, serverFiles,
+				deleteFiles);
+		if (cancelRequested)
+			return;
+		if (downloadFiles.size() > 0 || deleteFiles.size() > 0)
+			updateRequired = true;
+		for (FileInfo fileInfo : downloadFiles) {
+			totalSize += fileInfo.getFileSize();
+		}
+	}
+
+	void performUpdate() throws UpdateException, IOException {
+		if (updateRequired && !cancelRequested) {
 			try {
 				deleteFiles(deleteFiles);
 			} catch (IOException e) {
@@ -59,27 +100,24 @@ public class Updater {
 						"Could not delete local file. " + e.getMessage());
 			}
 			downloadFiles(downloadFiles);
-			return new UpdateResult(downloadFiles.size(), totalSize,
-					deleteFiles.size());
-		} else {
-			return new UpdateResult(0, 0, 0);
 		}
 	}
 
 	private void downloadFiles(List<FileInfo> filesToDownload)
-			throws UpdateException {
+			throws UpdateException, IOException {
 		for (FileInfo fileInfo : filesToDownload) {
-			try {
-				networker.downloadFile(fileInfo);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			networker.downloadFile(fileInfo);
+			if (!local.verify(fileInfo)) {
+				throw new UpdateException(ErrorType.DOWNLOAD_ERROR,
+						"Hash of downloaded file does not match hash on server.");
 			}
 		}
 	}
 
 	private void deleteFiles(List<FileInfo> filesToDelete) throws IOException {
 		for (FileInfo fileInfo : filesToDelete) {
+			if (cancelRequested)
+				return;
 			local.delete(fileInfo);
 		}
 	}
@@ -101,6 +139,8 @@ public class Updater {
 				// delete this file
 				deleteFiles.add(localFile);
 			}
+			if (cancelRequested)
+				return downloadFiles;
 		}
 		for (FileInfo serverFile : serverFiles) {
 			if (!localFiles.contains(serverFile)) {
