@@ -72,7 +72,7 @@ public final class NeWUpClient {
 	 *            check, false if not.
 	 */
 	public void checkForUpdates(boolean autoStart) {
-		if (thread.isAlive()) {
+		if (thread != null && thread.isAlive()) {
 			throw new IllegalStateException(
 					"There is an update check running. Please stop it or wait for it to finish before running a new check.");
 		} else {
@@ -101,7 +101,7 @@ public final class NeWUpClient {
 
 		public UpdateRunner(boolean autoStart) {
 			this.autoStart = autoStart;
-			updater = new Updater(networker, autoStart);
+			updater = new Updater(networker, server, local, autoStart);
 		}
 
 		public void cancel() {

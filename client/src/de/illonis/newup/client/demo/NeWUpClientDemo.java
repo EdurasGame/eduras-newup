@@ -24,7 +24,7 @@ public class NeWUpClientDemo {
 		System.out.println("Starting update");
 		URL server;
 		try {
-			server = new URL("http://example.com");
+			server = new URL("http://192.168.0.2/newup/");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			return;

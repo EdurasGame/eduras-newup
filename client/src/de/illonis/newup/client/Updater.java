@@ -8,8 +8,8 @@ import de.illonis.newup.client.UpdateException.ErrorType;
 
 public class Updater extends Thread {
 	private final Networker networker;
-	private LocalFiles local;
-	private ServerFiles server;
+	private final LocalFiles local;
+	private final ServerFiles server;
 	private boolean updateRequired;
 	private List<FileInfo> downloadFiles;
 	private List<FileInfo> deleteFiles;
@@ -18,9 +18,14 @@ public class Updater extends Thread {
 	private final boolean autoStart;
 	private IOException ioException;
 	private UpdateException updateException;
+	private List<FileInfo> serverFiles;
+	private String serverAllHash;
 
-	Updater(Networker networker, boolean autoStart) {
+	Updater(Networker networker, ServerFiles server, LocalFiles local,
+			boolean autoStart) {
 		this.networker = networker;
+		this.server = server;
+		this.local = local;
 		this.autoStart = autoStart;
 		deleteFiles = new LinkedList<FileInfo>();
 		downloadFiles = new LinkedList<FileInfo>();
@@ -68,7 +73,7 @@ public class Updater extends Thread {
 		deleteFiles.clear();
 		if (cancelRequested)
 			return;
-		String serverAllHash = server.getOverallHash();
+		serverAllHash = server.getOverallHash();
 		String clientAllHash = local.getOverallHash();
 		if (serverAllHash.equals(clientAllHash)) {
 			updateRequired = false;
@@ -77,7 +82,8 @@ public class Updater extends Thread {
 		if (cancelRequested)
 			return;
 		List<FileInfo> localFiles = local.getFileList();
-		List<FileInfo> serverFiles = server.getFileList();
+		serverFiles = server.getFileList();
+
 		if (cancelRequested)
 			return;
 		downloadFiles = computeDownloadFiles(localFiles, serverFiles,
@@ -100,6 +106,7 @@ public class Updater extends Thread {
 						"Could not delete local file. " + e.getMessage());
 			}
 			downloadFiles(downloadFiles);
+			local.updateLocalData(serverFiles, serverAllHash);
 		}
 	}
 
@@ -109,7 +116,8 @@ public class Updater extends Thread {
 			networker.downloadFile(fileInfo);
 			if (!local.verify(fileInfo)) {
 				throw new UpdateException(ErrorType.DOWNLOAD_ERROR,
-						"Hash of downloaded file does not match hash on server.");
+						"Hash of downloaded file " + fileInfo.getFileName()
+								+ " does not match hash on server.");
 			}
 		}
 	}
@@ -130,10 +138,12 @@ public class Updater extends Thread {
 			int serverIndex = serverFiles.indexOf(localFile);
 			if (serverIndex >= 0) {
 				if (localFile.hashEquals(serverFiles.get(serverIndex))) {
+					System.out.println(localFile.getFileName()
+							+ " is up to date");
 					// this file is up to date.
 				} else {
 					// update this file
-					downloadFiles.add(localFile);
+					downloadFiles.add(serverFiles.get(serverIndex));
 				}
 			} else {
 				// delete this file
@@ -148,6 +158,7 @@ public class Updater extends Thread {
 				downloadFiles.add(serverFile);
 			}
 		}
+
 		return downloadFiles;
 	}
 }

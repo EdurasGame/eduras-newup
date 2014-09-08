@@ -5,7 +5,8 @@ import java.util.List;
 
 public interface FileData {
 
-	final static String HASHLIST_FILENAME = "";
+	final static String HASHLIST_FILENAME = "files.hash";
+	final static String TOTALHASH_FILENAME = "all.hash";
 
 	List<FileInfo> getFileList() throws IOException;
 

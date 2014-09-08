@@ -1,11 +1,11 @@
 package de.illonis.newup.client;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class Networker {
 	private final ServerFiles server;
@@ -22,12 +22,8 @@ public class Networker {
 
 	void downloadFile(FileInfo fileInfo) throws IOException {
 		URL serverUrl = server.computeFileUrl(fileInfo);
-		ReadableByteChannel rbc = Channels.newChannel(serverUrl.openStream());
-		try (FileOutputStream fos = new FileOutputStream(
-				local.computeLocalUrl(fileInfo))) {
-			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		}
-		rbc.close();
+		Path localFile = local.computeLocalUrl(fileInfo);
+		Files.copy(serverUrl.openStream(), localFile,
+				StandardCopyOption.REPLACE_EXISTING);
 	}
-
 }

@@ -39,4 +39,9 @@ public class FileInfo {
 	public boolean hashEquals(FileInfo other) {
 		return this.hash.equals(other.getHash());
 	}
+
+	public String toFileString() {
+		return this.getHash() + " " + this.getFileSize() + " "
+				+ this.getFileName();
+	}
 }
