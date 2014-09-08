@@ -99,12 +99,7 @@ public class Updater extends Thread {
 
 	void performUpdate() throws UpdateException, IOException {
 		if (updateRequired && !cancelRequested) {
-			try {
-				deleteFiles(deleteFiles);
-			} catch (IOException e) {
-				throw new UpdateException(ErrorType.DELETE_LOCAL_FAILED,
-						"Could not delete local file. " + e.getMessage());
-			}
+			deleteFiles(deleteFiles);
 			downloadFiles(downloadFiles);
 			local.updateLocalData(serverFiles, serverAllHash);
 		}
@@ -122,11 +117,16 @@ public class Updater extends Thread {
 		}
 	}
 
-	private void deleteFiles(List<FileInfo> filesToDelete) throws IOException {
+	private void deleteFiles(List<FileInfo> filesToDelete) {
 		for (FileInfo fileInfo : filesToDelete) {
 			if (cancelRequested)
 				return;
-			local.delete(fileInfo);
+			try {
+				local.delete(fileInfo);
+			} catch (IOException e) {
+				// do nothing as failing to delete a file is no issue at all. It
+				// just sits there eating space...
+			}
 		}
 	}
 
