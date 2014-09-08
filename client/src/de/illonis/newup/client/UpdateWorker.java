@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.illonis.newup.client.UpdateException.ErrorType;
 
-public class Updater extends Thread {
+public class UpdateWorker extends Thread {
 	private final Networker networker;
 	private final LocalFiles local;
 	private final ServerFiles server;
@@ -21,7 +21,7 @@ public class Updater extends Thread {
 	private List<FileInfo> serverFiles;
 	private String serverAllHash;
 
-	Updater(Networker networker, ServerFiles server, LocalFiles local,
+	UpdateWorker(Networker networker, ServerFiles server, LocalFiles local,
 			boolean autoStart) {
 		this.networker = networker;
 		this.server = server;
@@ -36,6 +36,8 @@ public class Updater extends Thread {
 
 	@Override
 	public void run() {
+		if (cancelRequested)
+			return;
 		try {
 			getUpdateInfo();
 			if (autoStart && !cancelRequested) {
@@ -46,7 +48,6 @@ public class Updater extends Thread {
 		} catch (UpdateException e) {
 			updateException = e;
 		}
-
 	}
 
 	boolean isCancelled() {
@@ -137,13 +138,12 @@ public class Updater extends Thread {
 		for (FileInfo localFile : localFiles) {
 			int serverIndex = serverFiles.indexOf(localFile);
 			if (serverIndex >= 0) {
-				if (localFile.hashEquals(serverFiles.get(serverIndex))) {
-					System.out.println(localFile.getFileName()
-							+ " is up to date");
+				FileInfo serverFile = serverFiles.get(serverIndex);
+				if (localFile.hashEquals(serverFile)) {
 					// this file is up to date.
 				} else {
 					// update this file
-					downloadFiles.add(serverFiles.get(serverIndex));
+					downloadFiles.add(serverFile);
 				}
 			} else {
 				// delete this file
@@ -158,7 +158,6 @@ public class Updater extends Thread {
 				downloadFiles.add(serverFile);
 			}
 		}
-
 		return downloadFiles;
 	}
 }

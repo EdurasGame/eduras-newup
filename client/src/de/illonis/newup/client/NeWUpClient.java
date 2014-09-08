@@ -20,7 +20,6 @@ public final class NeWUpClient {
 	private ServerFiles server;
 	private final Networker networker;
 	private UpdateRunner thread;
-	private final String channel;
 
 	/**
 	 * Creates a new update-client.
@@ -46,7 +45,6 @@ public final class NeWUpClient {
 	 */
 	public NeWUpClient(URL updateUrl, Path localPath, String releaseChannel,
 			String authToken) {
-		this.channel = releaseChannel;
 		listeners = new LinkedList<UpdateListener>();
 		local = new LocalFiles(localPath);
 		server = new ServerFiles(updateUrl, releaseChannel, authToken);
@@ -103,12 +101,12 @@ public final class NeWUpClient {
 	}
 
 	private class UpdateRunner extends Thread {
-		private final Updater updater;
+		private final UpdateWorker updater;
 		private final boolean autoStart;
 
 		public UpdateRunner(boolean autoStart) {
 			this.autoStart = autoStart;
-			updater = new Updater(networker, server, local, autoStart);
+			updater = new UpdateWorker(networker, server, local, autoStart);
 		}
 
 		public void cancel() {
