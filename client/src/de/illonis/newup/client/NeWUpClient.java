@@ -20,15 +20,18 @@ public final class NeWUpClient {
 	private ServerFiles server;
 	private final Networker networker;
 	private UpdateRunner thread;
+	private final String channel;
 
 	/**
 	 * Creates a new update-client.
 	 * 
 	 * @param updateUrl
 	 *            url to server. Must contain path to updater-directory.
+	 * @param releaseChannel
+	 *            the name of the release channel to use.
 	 */
-	public NeWUpClient(URL updateUrl, Path localPath) {
-		this(updateUrl, localPath, "");
+	public NeWUpClient(URL updateUrl, Path localPath, String releaseChannel) {
+		this(updateUrl, localPath, releaseChannel, "");
 	}
 
 	/**
@@ -36,13 +39,17 @@ public final class NeWUpClient {
 	 * 
 	 * @param updateUrl
 	 *            url to server. Must contain path to updater-directory.
+	 * @param releaseChannel
+	 *            the name of the release channel to use.
 	 * @param authToken
 	 *            token for authentication.
 	 */
-	public NeWUpClient(URL updateUrl, Path localPath, String authToken) {
+	public NeWUpClient(URL updateUrl, Path localPath, String releaseChannel,
+			String authToken) {
+		this.channel = releaseChannel;
 		listeners = new LinkedList<UpdateListener>();
 		local = new LocalFiles(localPath);
-		server = new ServerFiles(updateUrl, authToken);
+		server = new ServerFiles(updateUrl, releaseChannel, authToken);
 		networker = new Networker(server, local);
 		thread = null;
 	}

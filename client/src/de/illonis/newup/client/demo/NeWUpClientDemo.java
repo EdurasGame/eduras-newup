@@ -30,7 +30,7 @@ public class NeWUpClientDemo {
 			return;
 		}
 		Path local = Paths.get("/tmp/newup/");
-		NeWUpClient client = new NeWUpClient(server, local);
+		NeWUpClient client = new NeWUpClient(server, local, "test");
 		client.addUpdateListener(new SimpleUpdateListener());
 		System.out.println("Checking for updates and perform them if any.");
 		client.checkForUpdates(true);

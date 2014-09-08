@@ -22,7 +22,7 @@ public class HashListFile {
 	HashListFile(InputStream input) throws IOException, NumberFormatException {
 		files = new LinkedList<FileInfo>();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-				input))) {
+				input, StandardCharsets.UTF_8))) {
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				if (line.trim().isEmpty())
