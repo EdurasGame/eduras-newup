@@ -45,10 +45,19 @@ public class ExampleNeWUpClient {
 		public void onUpdateCompleted(UpdateResult result) {
 			if (result.getNewFilesAmount() == 0) {
 				System.out.println("No update required.");
+				System.out.printf("Current version: %s (%s) from %s\n",
+						result.getLocalVersion(), result.getLocalTag(),
+						result.getLocalReleaseDate());
 			} else {
 				System.out.println("Update completed. Downloaded "
 						+ result.getNewFilesAmount() + " new files.");
 				System.out.println("Patchnotes: " + result.getNotice());
+				System.out.printf("Current version: %s (%s) from %s\n",
+						result.getServerVersion(), result.getServerTag(),
+						result.getServerReleaseDate());
+				System.out.printf("Old version was: %s (%s) from %s\n",
+						result.getLocalVersion(), result.getLocalTag(),
+						result.getLocalReleaseDate());
 			}
 			// go on with something
 		}
@@ -59,6 +68,12 @@ public class ExampleNeWUpClient {
 					+ " new files (total " + result.getDownloadSize()
 					+ " Kb), " + result.getDeleteLocalAmount()
 					+ " files can be deleted locally.");
+			System.out.printf("Server version: %s (%s) from %s\n",
+					result.getServerVersion(), result.getServerTag(),
+					result.getServerReleaseDate());
+			System.out.printf("Client version: %s (%s) from %s\n",
+					result.getLocalVersion(), result.getLocalTag(),
+					result.getLocalReleaseDate());
 			System.out.println("Patchnotes: " + result.getNotice());
 		}
 

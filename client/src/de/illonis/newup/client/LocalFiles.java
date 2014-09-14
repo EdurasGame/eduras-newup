@@ -8,14 +8,22 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 public class LocalFiles implements FileData {
 	private final Path localPath;
+	private String version;
+	private String tag;
+	private Date updated;
 
 	public LocalFiles(Path path) {
 		this.localPath = path;
+		this.version = "n/a";
+		this.tag = "n/a";
+		this.updated = new Date(0);
 	}
 
 	@Override
@@ -33,18 +41,27 @@ public class LocalFiles implements FileData {
 		if (!Files.exists(file))
 			return "";
 		List<String> hash = Files.readAllLines(file, StandardCharsets.UTF_8);
-		return hash.get(0);
+		String hashString = hash.get(0);
+		version = hash.get(1);
+		tag = hash.get(2);
+		try {
+			updated = DATE_FORMAT.parse(hash.get(2));
+		} catch (ParseException e) {
+		}
+		return hashString;
 	}
 
 	void delete(FileInfo file) throws IOException {
 		Files.delete(localPath.resolve(file.getFileName()));
 	}
 
-	void updateLocalData(List<FileInfo> files, String totalHash)
+	void updateLocalData(List<FileInfo> files, String totalHash, String version, String tag)
 			throws IOException {
 		new HashListFile(files).saveTo(localPath.resolve(HASHLIST_FILENAME));
 		List<String> lines = new LinkedList<String>();
 		lines.add(totalHash);
+		lines.add(version);
+		lines.add(tag);
 		Files.write(localPath.resolve(TOTALHASH_FILENAME), lines,
 				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
 	}
@@ -83,6 +100,21 @@ public class LocalFiles implements FileData {
 		} catch (IOException | NoSuchAlgorithmException e) {
 			return "";
 		}
+	}
+
+	@Override
+	public String getVersion() {
+		return version;
+	}
+
+	@Override
+	public String getTag() {
+		return tag;
+	}
+
+	@Override
+	public Date getReleaseDate() {
+		return updated;
 	}
 
 }

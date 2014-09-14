@@ -63,7 +63,7 @@ public class UpdateWorker extends Thread {
 		if (updateException != null)
 			throw updateException;
 		return new UpdateResult(downloadFiles.size(), totalSize,
-				deleteFiles.size(), notice);
+				deleteFiles.size(), notice, server, local);
 	}
 
 	void cancel() {
@@ -105,7 +105,8 @@ public class UpdateWorker extends Thread {
 		if (updateRequired && !cancelRequested) {
 			deleteFiles(deleteFiles);
 			downloadFiles(downloadFiles);
-			local.updateLocalData(serverFiles, serverAllHash);
+			local.updateLocalData(serverFiles, serverAllHash,
+					server.getVersion(), server.getTag());
 		}
 	}
 
