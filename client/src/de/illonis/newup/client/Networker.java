@@ -23,6 +23,7 @@ public class Networker {
 	void downloadFile(FileInfo fileInfo) throws IOException {
 		URL serverUrl = server.computeFileUrl(fileInfo);
 		Path localFile = local.computeLocalUrl(fileInfo);
+		Files.createDirectories(localFile.getParent());
 		Files.copy(serverUrl.openStream(), localFile,
 				StandardCopyOption.REPLACE_EXISTING);
 	}
