@@ -17,13 +17,20 @@ public class ExampleNeWUpClient {
 	 * Starts a simple client demo.
 	 * 
 	 * @param args
-	 *            <li>1. server url <li>2. local path <li>3. release-channel
+	 *            1. server url<br>
+	 *            2. local path<br>
+	 *            3. release-channel<br>
+	 *            4. autoUpdate? default <i>true</i>
 	 * 
 	 */
 	public static void main(String[] args) {
 		String serverAddress = args[0];
 		String localPath = args[1];
 		String channelName = args[2];
+		boolean autoStart = true;
+		if (args.length == 4) {
+			autoStart = Boolean.parseBoolean(args[3]);
+		}
 		System.out.println("Starting update");
 		URL server;
 		try {
@@ -36,7 +43,7 @@ public class ExampleNeWUpClient {
 		NeWUpClient client = new NeWUpClient(server, local, channelName);
 		client.addUpdateListener(new SimpleUpdateListener());
 		System.out.println("Checking for updates and perform them if any.");
-		client.checkForUpdates(true);
+		client.checkForUpdates(autoStart);
 	}
 
 	static class SimpleUpdateListener implements UpdateListener {
