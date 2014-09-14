@@ -33,7 +33,6 @@ gitversion
 # Logs and databases #
 ######################
 *.log
-*.sql
 *.sqlite
 
 # User specific stuff #

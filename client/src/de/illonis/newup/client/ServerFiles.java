@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ServerFiles implements FileData {
@@ -11,11 +12,13 @@ public class ServerFiles implements FileData {
 	private final URL serverUrl;
 	private final String authToken;
 	private final String releaseChannel;
+	private String notice;
 
 	public ServerFiles(URL updateUrl, String releaseChannel, String authToken) {
 		this.serverUrl = updateUrl;
 		this.releaseChannel = releaseChannel;
 		this.authToken = authToken;
+		notice = "";
 	}
 
 	@Override
@@ -31,8 +34,17 @@ public class ServerFiles implements FileData {
 				"all.php?channel=" + releaseChannel + "&token=" + authToken)),
 				"UTF-8");
 		String hash = scanner.nextLine();
+		try {
+			notice = scanner.nextLine();
+		} catch (NoSuchElementException e) {
+			notice = "";
+		}
 		scanner.close();
 		return hash;
+	}
+
+	String getNotice() {
+		return notice;
 	}
 
 	URL computeFileUrl(FileInfo file) throws MalformedURLException {

@@ -48,6 +48,7 @@ public class ExampleNeWUpClient {
 			} else {
 				System.out.println("Update completed. Downloaded "
 						+ result.getNewFilesAmount() + " new files.");
+				System.out.println("Patchnotes: " + result.getNotice());
 			}
 			// go on with something
 		}
@@ -58,6 +59,7 @@ public class ExampleNeWUpClient {
 					+ " new files (total " + result.getDownloadSize()
 					+ " Kb), " + result.getDeleteLocalAmount()
 					+ " files can be deleted locally.");
+			System.out.println("Patchnotes: " + result.getNotice());
 		}
 
 		@Override

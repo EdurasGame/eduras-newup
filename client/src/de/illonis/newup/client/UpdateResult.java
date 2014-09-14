@@ -5,11 +5,23 @@ public class UpdateResult {
 	private final int newFilesAmount;
 	private final long downloadSize;
 	private final int deleteLocalAmount;
+	private final String notice;
 
-	UpdateResult(int newFilesAmount, long downloadSize, int deleteLocalAmount) {
+	UpdateResult(int newFilesAmount, long downloadSize, int deleteLocalAmount,
+			String note) {
 		this.newFilesAmount = newFilesAmount;
 		this.downloadSize = downloadSize;
 		this.deleteLocalAmount = deleteLocalAmount;
+		this.notice = note;
+	}
+
+	/**
+	 * Returns the notice for this update.
+	 * 
+	 * @return a text that should be displayed to the user after update.
+	 */
+	public String getNotice() {
+		return notice;
 	}
 
 	/**

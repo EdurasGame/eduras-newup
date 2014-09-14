@@ -20,6 +20,7 @@ public class UpdateWorker extends Thread {
 	private UpdateException updateException;
 	private List<FileInfo> serverFiles;
 	private String serverAllHash;
+	private String notice;
 
 	UpdateWorker(Networker networker, ServerFiles server, LocalFiles local,
 			boolean autoStart) {
@@ -32,6 +33,7 @@ public class UpdateWorker extends Thread {
 		updateRequired = true;
 		totalSize = 0;
 		cancelRequested = false;
+		notice = "";
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class UpdateWorker extends Thread {
 		if (updateException != null)
 			throw updateException;
 		return new UpdateResult(downloadFiles.size(), totalSize,
-				deleteFiles.size());
+				deleteFiles.size(), notice);
 	}
 
 	void cancel() {
@@ -75,6 +77,7 @@ public class UpdateWorker extends Thread {
 		if (cancelRequested)
 			return;
 		serverAllHash = server.getOverallHash();
+		notice = server.getNotice();
 		String clientAllHash = local.getOverallHash();
 		if (serverAllHash.equals(clientAllHash)) {
 			updateRequired = false;
