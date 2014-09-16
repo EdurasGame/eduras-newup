@@ -1,0 +1,42 @@
+a {
+	display:inline-block;
+	padding:5px;
+	border-radius:5px;
+	background:	silver;
+	border:1px solid gray;
+	text-decoration:none;
+	margin:3px;
+	color:black;
+	-webkit-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.3); /* WebKit */
+	-moz-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.3); /* Firefox */
+	box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.3); /* Standard */ 
+}
+
+a:hover {
+	background:gray;
+	color:white;
+	-webkit-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.6); /* WebKit */
+	-moz-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.6); /* Firefox */
+	box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.6); /* Standard */ 
+}
+
+table {
+	border-collapse:collapse;
+	border-spacing: 0;	
+}
+
+td, th {
+	border-bottom:1px solid gray;
+	padding:3px;
+}
+
+.files {
+	font-size:small;
+	line-height:16px;
+	border:1px solid black;
+	padding:8px;
+	margin-left:15px;
+	width:50%;
+	max-height:200px;
+	overflow-y:auto;
+}
