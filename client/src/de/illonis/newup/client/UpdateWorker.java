@@ -70,7 +70,7 @@ public class UpdateWorker extends Thread {
 		cancelRequested = true;
 	}
 
-	void getUpdateInfo() throws IOException {
+	void getUpdateInfo() throws IOException, UpdateException {
 		downloadFiles.clear();
 		totalSize = 0;
 		deleteFiles.clear();

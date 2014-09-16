@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import de.illonis.newup.client.UpdateException.ErrorType;
+
 public class ServerFiles implements FileData {
 
 	private final URL serverUrl;
@@ -31,7 +33,7 @@ public class ServerFiles implements FileData {
 	public String getReleaseChannel() {
 		return releaseChannel;
 	}
-	
+
 	@Override
 	public List<FileInfo> getFileList() throws IOException {
 		return new HashListFile(Networker.readFile(new URL(serverUrl,
@@ -40,7 +42,7 @@ public class ServerFiles implements FileData {
 	}
 
 	@Override
-	public String getOverallHash() throws IOException {
+	public String getOverallHash() throws IOException, UpdateException {
 		Scanner scanner = new Scanner(Networker.readFile(new URL(serverUrl,
 				"all.php?channel=" + releaseChannel + "&token=" + authToken)),
 				"UTF-8");
@@ -51,7 +53,9 @@ public class ServerFiles implements FileData {
 			released = DATE_FORMAT.parse(scanner.nextLine());
 			notice = scanner.nextLine();
 		} catch (NoSuchElementException | ParseException e) {
-			notice = "";
+			scanner.close();
+			throw new UpdateException(ErrorType.INVALID_CHANNEL, "Channel "
+					+ releaseChannel + " does not exist.");
 		}
 		scanner.close();
 		return hash;
