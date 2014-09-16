@@ -4,6 +4,8 @@
 	   header("Location: https://" . $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"]);
 	   exit();
 	}
+	if (file_exists('setup2.php'))
+		die('Run <a href="setup.php">Setup</a> before using, or delete setup.php if you already set up.');
 	require_once('basic.php');
 	function startsWith($haystack, $needle)
 {
@@ -137,7 +139,7 @@ function listFiles($folder, $files) {
 				break;
 				case 'dodelete':
 					$sconn->delete('files', array('channel' => $channel));
-					$dir = 'files/'.$channel;
+					$dir = $conf['datafolder'].'/'.$channel;
 					$it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
 					$files = new RecursiveIteratorIterator($it,
 					             RecursiveIteratorIterator::CHILD_FIRST);
@@ -163,7 +165,7 @@ function listFiles($folder, $files) {
 						echo '<p>Channel already exists.</p>';
 					} elseif (preg_match($pattern, $channelname)) {
 						$sconn->write('channels', array('channelname' => $channelname, 'updated' => '0000-00-00 00:00:00'));
-						mkdir('files/'.$channelname);
+						mkdir($conf['datafolder'].'/'.$channelname);
 						echo '<p>channel created</p>';
 					} else {
 						echo '<p>Invalid channelname entered.</p>';
@@ -175,7 +177,7 @@ function listFiles($folder, $files) {
 					$version = $_POST['releasenumber'];
 					$tag = $_POST['releasetag'];
 					$displaytext = $_POST['displaytext'];
-					$targetfolder = 'files/'.$channelname;
+					$targetfolder = $conf['datafolder'].'/'.$channelname;
 					rrmdir($targetfolder);
 					mkdir($targetfolder);
 					recurse_copy($sfolder, $targetfolder);
@@ -198,7 +200,7 @@ function listFiles($folder, $files) {
 					echo $sconn->getError();
 					$files = $files->fetch_object();
 					echo $files->numfiles.' (ca. '.toFileSize($files->totalsize).')';
-					$dir = 'files/'.$channeldata->channelname;
+					$dir = $conf['datafolder'].'/'.$channeldata->channelname;
 					listFiles($dir, getFilesInDir($dir));
 				break;
 				case 'doupdate':
@@ -241,7 +243,7 @@ function listFiles($folder, $files) {
 						User notice: <input type="text" name="displaytext"><br>
 						Source folder: <select name="folder">
 							<?php
-								$dirs = glob('newfiles/*',GLOB_ONLYDIR);
+								$dirs = glob($conf['newdatafolder'].'/*',GLOB_ONLYDIR);
 								foreach($dirs as $dir) {
 									echo '<option>'.$dir.'</option>';
 								}

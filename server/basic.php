@@ -1,7 +1,8 @@
 <?php
   if (isset($_GET['channel'])) $channel = $_GET['channel'];
 	require_once('db_connection.php');
-   db_connection::setupConnection('localhost','newup','newup','DA3JAajyVecXZcnX');
+	require_once('config.ini.php');
+   db_connection::setupConnection($conf['mysql_server'], $conf['mysql_db'], $conf['mysql_user'], $conf['mysql_password']);
    $sconn = new db_connection();
    
 function toFileSize($value, $offset = 1)
@@ -49,7 +50,7 @@ function getFilesInDir($dir) {
 function scanChannel($channel) {
 	global $sconn;
 	$sconn->delete('files', array('channel' => $channel));
-	$basepath = 'files/'.$channel;
+	$basepath = $conf['datafolder'].'/'.$channel;
 	$files = getFilesInDir($basepath);
 	$hashes = array();
 	foreach($files as $file) {
