@@ -114,5 +114,4 @@ public class UpdateResult {
 	public int getDeleteLocalAmount() {
 		return deleteLocalAmount;
 	}
-
 }

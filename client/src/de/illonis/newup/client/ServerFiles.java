@@ -28,6 +28,10 @@ public class ServerFiles implements FileData {
 		tag = "";
 	}
 
+	public String getReleaseChannel() {
+		return releaseChannel;
+	}
+	
 	@Override
 	public List<FileInfo> getFileList() throws IOException {
 		return new HashListFile(Networker.readFile(new URL(serverUrl,

@@ -1,7 +1,10 @@
 package de.illonis.newup.client;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -148,5 +151,44 @@ public final class NeWUpClient {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static String getLocalChannel(Path local) throws IOException {
+		LocalFiles files = new LocalFiles(local);
+		files.getOverallHash();
+		return files.getReleaseChannel();
+	}
+
+	/**
+	 * Queries server for a list of all available release channels.
+	 * 
+	 * @param server
+	 *            url to server
+	 * @param listener
+	 *            listener that receives results.
+	 */
+	public static void queryChannels(final URL server,
+			final ChannelListener listener) {
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try (BufferedReader reader = new BufferedReader(
+						new InputStreamReader(Networker.readFile(new URL(
+								server, "channels.php")),
+								StandardCharsets.UTF_8))) {
+					String line = null;
+					List<String> channels = new LinkedList<String>();
+					while ((line = reader.readLine()) != null) {
+						if (line.trim().isEmpty())
+							continue;
+						channels.add(line.trim());
+					}
+					listener.onChannelListReceived(channels);
+				} catch (IOException e) {
+					listener.onError(e);
+				}
+			}
+		});
+		t.start();
 	}
 }

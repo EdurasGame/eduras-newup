@@ -18,12 +18,18 @@ public class LocalFiles implements FileData {
 	private String version;
 	private String tag;
 	private Date updated;
+	private String releaseChannel;
 
 	public LocalFiles(Path path) {
 		this.localPath = path;
 		this.version = "n/a";
 		this.tag = "n/a";
 		this.updated = new Date(0);
+		releaseChannel = "n/a";
+	}
+
+	public String getReleaseChannel() {
+		return releaseChannel;
 	}
 
 	@Override
@@ -42,8 +48,13 @@ public class LocalFiles implements FileData {
 			return "";
 		List<String> hash = Files.readAllLines(file, StandardCharsets.UTF_8);
 		String hashString = hash.get(0);
-		version = hash.get(1);
-		tag = hash.get(2);
+		version = hash.get(2);
+		tag = hash.get(3);
+		releaseChannel = hash.get(1);
+		try {
+			updated = DATE_FORMAT.parse(hash.get(4));
+		} catch (ParseException e1) {
+		}
 		try {
 			updated = DATE_FORMAT.parse(hash.get(2));
 		} catch (ParseException e) {
@@ -55,13 +66,16 @@ public class LocalFiles implements FileData {
 		Files.delete(localPath.resolve(file.getFileName()));
 	}
 
-	void updateLocalData(List<FileInfo> files, String totalHash, String version, String tag)
+	void updateLocalData(List<FileInfo> files, String totalHash,
+			String version, String tag, String channel, Date date)
 			throws IOException {
 		new HashListFile(files).saveTo(localPath.resolve(HASHLIST_FILENAME));
 		List<String> lines = new LinkedList<String>();
 		lines.add(totalHash);
+		lines.add(channel);
 		lines.add(version);
 		lines.add(tag);
+		lines.add(DATE_FORMAT.format(date));
 		Files.write(localPath.resolve(TOTALHASH_FILENAME), lines,
 				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
 	}

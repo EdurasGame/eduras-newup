@@ -106,7 +106,8 @@ public class UpdateWorker extends Thread {
 			deleteFiles(deleteFiles);
 			downloadFiles(downloadFiles);
 			local.updateLocalData(serverFiles, serverAllHash,
-					server.getVersion(), server.getTag());
+					server.getVersion(), server.getTag(),
+					server.getReleaseChannel(), server.getReleaseDate());
 		}
 	}
 
