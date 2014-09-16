@@ -106,7 +106,8 @@ function listFiles($folder, $files) {
 				if (!$empty) {
 						echo '<a href="?act=details&channel='.$channel->channelname.'">details</a>';
 				}
-				echo '<a href="?act=update&channel='.$channel->channelname.'">update</a></td></tr>';				
+				echo '<a href="?act=update&channel='.$channel->channelname.'">update</a>
+				<a href="?act=delete&channel='.$channel->channelname.'">delete</a></td></tr>';				
 			}
 		?>
 		</table>
@@ -125,6 +126,34 @@ function listFiles($folder, $files) {
 						<input type="submit" value="Create">
 						</form>
 					<?php
+				break;
+				case 'delete':
+					echo '<h2>Delete channel</h2>';
+					
+					echo '<p>Do you really want to delete channel "'.$channel.'"?</p>';
+					echo '<p><b>You cannot recover a deleted channel!</b></p>';
+					echo '<p><a href="?act=dodelete&amp;channel='.$channel.'" style="background:red;">Delete channel "'.$channel.'"</a> <a href="index.php">Abort</a></p>';
+					
+				break;
+				case 'dodelete':
+					$sconn->delete('files', array('channel' => $channel));
+					$dir = 'files/'.$channel;
+					$it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+					$files = new RecursiveIteratorIterator($it,
+					             RecursiveIteratorIterator::CHILD_FIRST);
+					foreach($files as $file) {
+					    if ($file->getFilename() === '.' || $file->getFilename() === '..') {
+					        continue;
+					    }
+					    if ($file->isDir()){
+					        rmdir($file->getRealPath());
+					    } else {
+					        unlink($file->getRealPath());
+					    }
+					}
+					rmdir($dir);					
+					$sconn->delete('channels', array('channelname' => $channel));
+					echo '<p>Channel '.$channel.' deleted.</p>';
 				break;
 				case 'doaddchannel':
 					echo '<h2>New channel</h2>';
