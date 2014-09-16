@@ -28,8 +28,9 @@ NeWUp (currently) has a few limitations that you should keep in order not to bre
 ## Setup
 
 1. Unpack the `newup-server.tar.gz` to a folder on your webserver.
-2. Open `https://<webserver/<folder>/setup.php` in your browser
-3. Follow the steps on screen.
+2. Edit your settings in `config.ini.php`
+3. Open `https://<webserver/<folder>/setup.php` in your browser
+4. Follow the steps on screen.
 
 # Client
 
