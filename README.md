@@ -42,6 +42,7 @@ All you have to do to is adding `newup-client.jar` to your project.
 ## Usage
 > You can take a look at the `example`-package to get a quick example.
 
+### Update
 In general, there are two kinds of workflows that you can choose of:
 
 - Trigger download automatically each time an update is available *or*
@@ -75,7 +76,7 @@ If you choose the first method, you should keep in mind, that the `onUpdateInfoR
 
 If you choose the second method, you should prompt the user in the `onUpdateInfoReceived(...)` method and call the `checkForUpdates(bool)` method again **on the same updater instance** with `true` as parameter if the user wants to download the update. So in this case, you have to keep a reference to the `NeWUpClient` instance.
 
-### the `UpdateResult` object
+#### the `UpdateResult` object
 
 The `UpdateResult` object is passed to the listener whenever update information are retrieved or an update completed successfully. This object contains relevant data that can be displayed to the user for information.
 
@@ -88,3 +89,8 @@ This object contains the following information:
 - a release information String for latest release on server
 
 For more details, take a look at JavaDoc.
+
+### Query channels
+To retrieve current client channel, call static `getLocalChannel` method.
+
+You can easily query avaliable channels by calling the static `queryChannels` method with an appropriate listener attached.
