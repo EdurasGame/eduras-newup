@@ -14,9 +14,12 @@ public class UpdateResult {
 	private final Date localReleaseDate;
 	private final String localVersion;
 	private final String localTag;
+	private final String channel;
 
-	UpdateResult(int newFilesAmount, long downloadSize, int deleteLocalAmount,
-			String note, ServerFiles server, LocalFiles local) {
+	UpdateResult(String channel, int newFilesAmount, long downloadSize,
+			int deleteLocalAmount, String note, ServerFiles server,
+			LocalFiles local) {
+		this.channel = channel;
 		this.newFilesAmount = newFilesAmount;
 		this.downloadSize = downloadSize;
 		this.deleteLocalAmount = deleteLocalAmount;
@@ -36,6 +39,15 @@ public class UpdateResult {
 	 */
 	public String getServerTag() {
 		return serverTag;
+	}
+
+	/**
+	 * Returns the name of updated channel.
+	 * 
+	 * @return channel name.
+	 */
+	public String getChannel() {
+		return channel;
 	}
 
 	/**

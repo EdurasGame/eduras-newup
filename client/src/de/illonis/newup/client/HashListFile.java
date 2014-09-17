@@ -43,7 +43,8 @@ public class HashListFile {
 
 	void saveTo(Path path) throws IOException {
 		BufferedWriter writer = Files.newBufferedWriter(path,
-				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+				StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING,
+				StandardOpenOption.CREATE);
 		for (FileInfo file : files) {
 			writer.write(file.toFileString() + "\n");
 		}

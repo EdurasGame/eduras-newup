@@ -77,7 +77,8 @@ public class LocalFiles implements FileData {
 		lines.add(tag);
 		lines.add(DATE_FORMAT.format(date));
 		Files.write(localPath.resolve(TOTALHASH_FILENAME), lines,
-				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+				StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING,
+				StandardOpenOption.CREATE);
 	}
 
 	Path computeLocalUrl(FileInfo file) {

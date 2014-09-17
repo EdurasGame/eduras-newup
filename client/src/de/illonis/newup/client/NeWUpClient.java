@@ -18,7 +18,7 @@ import java.util.List;
  */
 public final class NeWUpClient {
 	
-	public final static int VERSION = 1;
+	public final static int VERSION = 2;
 
 	private final List<UpdateListener> listeners;
 	private LocalFiles local;

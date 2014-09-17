@@ -68,8 +68,9 @@ public class UpdateWorker extends Thread {
 		}
 		if (updateException != null)
 			throw updateException;
-		return new UpdateResult(downloadFiles.size(), totalSize,
-				deleteFiles.size(), notice, server, local);
+		return new UpdateResult(server.getReleaseChannel(),
+				downloadFiles.size(), totalSize, deleteFiles.size(), notice,
+				server, local);
 	}
 
 	void cancel() {
