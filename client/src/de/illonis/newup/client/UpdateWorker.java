@@ -21,10 +21,14 @@ public class UpdateWorker extends Thread {
 	private List<FileInfo> serverFiles;
 	private String serverAllHash;
 	private String notice;
+	private final List<UpdateListener> listeners;
+	private int deleted;
+	private int downloaded;
 
 	UpdateWorker(Networker networker, ServerFiles server, LocalFiles local,
-			boolean autoStart) {
+			boolean autoStart, List<UpdateListener> listeners) {
 		this.networker = networker;
+		this.listeners = listeners;
 		this.server = server;
 		this.local = local;
 		this.autoStart = autoStart;
@@ -32,6 +36,8 @@ public class UpdateWorker extends Thread {
 		downloadFiles = new LinkedList<FileInfo>();
 		updateRequired = true;
 		totalSize = 0;
+		deleted = 0;
+		downloaded = 0;
 		cancelRequested = false;
 		notice = "";
 	}
@@ -105,16 +111,21 @@ public class UpdateWorker extends Thread {
 		if (updateRequired && !cancelRequested) {
 			deleteFiles(deleteFiles);
 			downloadFiles(downloadFiles);
+			notifyProgress("Updating local infos.");
 			local.updateLocalData(serverFiles, serverAllHash,
 					server.getVersion(), server.getTag(),
 					server.getReleaseChannel(), server.getReleaseDate());
+			notifyProgress("Done.");
 		}
 	}
 
 	private void downloadFiles(List<FileInfo> filesToDownload)
 			throws UpdateException, IOException {
 		for (FileInfo fileInfo : filesToDownload) {
+			notifyProgress("Downloading " + fileInfo.getFileName());
 			networker.downloadFile(fileInfo);
+			downloaded++;
+			notifyProgress("Verify download of " + fileInfo.getFileName());
 			if (!local.verify(fileInfo)) {
 				throw new UpdateException(ErrorType.DOWNLOAD_ERROR,
 						"Hash of downloaded file " + fileInfo.getFileName()
@@ -128,7 +139,9 @@ public class UpdateWorker extends Thread {
 			if (cancelRequested)
 				return;
 			try {
+				notifyProgress("Deleting " + fileInfo.getFileName());
 				local.delete(fileInfo);
+				deleted++;
 			} catch (IOException e) {
 				// do nothing as failing to delete a file is no issue at all. It
 				// just sits there eating space...
@@ -164,5 +177,20 @@ public class UpdateWorker extends Thread {
 			}
 		}
 		return downloadFiles;
+	}
+
+	private void notifyProgress(String note) {
+		int total = Math.min(deleteFiles.size(), 5) + downloadFiles.size();
+		int deleteProgress;
+		if (deleteFiles.size() > 0) {
+			deleteProgress = (int) Math.floor(((float) deleted / deleteFiles
+					.size()) * Math.min(deleteFiles.size(), 5));
+		}
+		deleteProgress = 0;
+		int current = deleteProgress + downloaded;
+		int progress = Math.round((float) current * 100 / total);
+		for (UpdateListener listener : listeners) {
+			listener.updateProgress(progress, note);
+		}
 	}
 }

@@ -17,6 +17,8 @@ import java.util.List;
  * 
  */
 public final class NeWUpClient {
+	
+	public final static int VERSION = 1;
 
 	private final List<UpdateListener> listeners;
 	private LocalFiles local;
@@ -109,7 +111,7 @@ public final class NeWUpClient {
 
 		public UpdateRunner(boolean autoStart) {
 			this.autoStart = autoStart;
-			updater = new UpdateWorker(networker, server, local, autoStart);
+			updater = new UpdateWorker(networker, server, local, autoStart, listeners);
 		}
 
 		public void cancel() {
