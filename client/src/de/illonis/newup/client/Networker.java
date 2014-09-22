@@ -24,7 +24,8 @@ public class Networker {
 		URL serverUrl = server.computeFileUrl(fileInfo);
 		Path localFile = local.computeLocalUrl(fileInfo);
 		Files.createDirectories(localFile.getParent());
-		Files.copy(serverUrl.openStream(), localFile,
-				StandardCopyOption.REPLACE_EXISTING);
+		try (InputStream in = serverUrl.openStream()) {
+			Files.copy(in, localFile, StandardCopyOption.REPLACE_EXISTING);
+		}
 	}
 }

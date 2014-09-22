@@ -86,7 +86,12 @@ public class LocalFiles implements FileData {
 	}
 
 	boolean verify(FileInfo file) {
-		String hash = computeHash(computeLocalUrl(file));
+		String hash;
+		try {
+			hash = computeHash(computeLocalUrl(file));
+		} catch (NoSuchAlgorithmException | IOException e) {
+			return false;
+		}
 		return hash.equals(file.getHash());
 	}
 
@@ -96,10 +101,13 @@ public class LocalFiles implements FileData {
 	 * @param file
 	 *            the file to compute hash from.
 	 * @return SHA-256 hash in hexadecimal format.
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public static String computeHash(Path file) {
-		try {
-			InputStream in = Files.newInputStream(file);
+	public static String computeHash(Path file) throws IOException,
+			NoSuchAlgorithmException {
+		try (InputStream in = Files.newInputStream(file)) {
+
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			byte[] md = new byte[8192];
 
@@ -112,8 +120,6 @@ public class LocalFiles implements FileData {
 				sb.append(String.format("%02x", b));
 			}
 			return sb.toString();
-		} catch (IOException | NoSuchAlgorithmException e) {
-			return "";
 		}
 	}
 
