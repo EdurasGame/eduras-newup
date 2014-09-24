@@ -30,6 +30,7 @@ public class HashListFile {
 				files.add(parseLine(line));
 			}
 		}
+		input.close();
 	}
 
 	private FileInfo parseLine(String line) throws NumberFormatException {

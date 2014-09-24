@@ -43,21 +43,21 @@ public class ServerFiles implements FileData {
 
 	@Override
 	public String getOverallHash() throws IOException, UpdateException {
-		Scanner scanner = new Scanner(Networker.readFile(new URL(serverUrl,
-				"all.php?channel=" + releaseChannel + "&token=" + authToken)),
-				"UTF-8");
-		String hash = scanner.nextLine();
-		try {
-			version = scanner.nextLine();
-			tag = scanner.nextLine();
-			released = DATE_FORMAT.parse(scanner.nextLine());
-			notice = scanner.nextLine();
-		} catch (NoSuchElementException | ParseException e) {
-			scanner.close();
-			throw new UpdateException(ErrorType.INVALID_CHANNEL, "Channel "
-					+ releaseChannel + " does not exist.");
+		String hash;
+		try (Scanner scanner = new Scanner(Networker.readFile(new URL(
+				serverUrl, "all.php?channel=" + releaseChannel + "&token="
+						+ authToken)), "UTF-8")) {
+			hash = scanner.nextLine();
+			try {
+				version = scanner.nextLine();
+				tag = scanner.nextLine();
+				released = DATE_FORMAT.parse(scanner.nextLine());
+				notice = scanner.nextLine();
+			} catch (NoSuchElementException | ParseException e) {
+				throw new UpdateException(ErrorType.INVALID_CHANNEL, "Channel "
+						+ releaseChannel + " does not exist.");
+			}
 		}
-		scanner.close();
 		return hash;
 	}
 
