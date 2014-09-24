@@ -111,7 +111,11 @@ public class UpdateWorker extends Thread {
 	void performUpdate() throws UpdateException, IOException {
 		if (updateRequired && !cancelRequested) {
 			deleteFiles(deleteFiles);
+			if (cancelRequested)
+				return;
 			downloadFiles(downloadFiles);
+			if (cancelRequested)
+				return;
 			notifyProgress("Updating local infos.");
 			local.updateLocalData(serverFiles, serverAllHash,
 					server.getVersion(), server.getTag(),
@@ -123,10 +127,14 @@ public class UpdateWorker extends Thread {
 	private void downloadFiles(List<FileInfo> filesToDownload)
 			throws UpdateException, IOException {
 		for (FileInfo fileInfo : filesToDownload) {
+			if (cancelRequested)
+				return;
 			notifyProgress("Downloading " + fileInfo.getFileName());
 			networker.downloadFile(fileInfo);
 			downloaded++;
 			notifyProgress("Verify download of " + fileInfo.getFileName());
+			if (cancelRequested)
+				return;
 			if (!local.verify(fileInfo)) {
 				throw new UpdateException(ErrorType.DOWNLOAD_ERROR,
 						"Hash of downloaded file " + fileInfo.getFileName()
