@@ -116,6 +116,7 @@ public final class NeWUpClient {
 
 		public void cancel() {
 			updater.cancel();
+			updater.interrupt();
 		}
 
 		@Override
@@ -126,6 +127,8 @@ public final class NeWUpClient {
 				UpdateResult result;
 				try {
 					if (updater.isCancelled()) {
+						local.delete(new FileInfo("all.hash", "", 0));
+						local.delete(new FileInfo("files.hash", "", 0));
 						for (UpdateListener listener : listeners) {
 							listener.onUpdateCancelled();
 						}
